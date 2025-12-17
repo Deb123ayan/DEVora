@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial, PerspectiveCamera, Grid, Stars, Sparkles, Text, Line, Ring, Icosahedron, Box, Cylinder } from "@react-three/drei";
+import { Float, MeshDistortMaterial, PerspectiveCamera, Grid, Stars, Text, Line, Ring, Box, Cylinder } from "@react-three/drei";
 import { useRef, useMemo, useState } from "react";
 import * as THREE from "three";
 
@@ -48,37 +48,17 @@ function TechRing({ position, color, scale = 1, speed = 1 }: { position: [number
             <Ring args={[1.8, 1.82, 32]} renderOrder={1}>
                  <meshBasicMaterial color={color} transparent opacity={0.1} side={THREE.DoubleSide} />
             </Ring>
-            {[...Array(8)].map((_, i) => (
-                <mesh key={i} position={[Math.cos(i * Math.PI / 4) * 2, Math.sin(i * Math.PI / 4) * 2, 0]} rotation={[0, 0, i * Math.PI / 4]}>
-                    <boxGeometry args={[0.2, 0.05, 0.05]} />
-                    <meshBasicMaterial color={color} />
-                </mesh>
-            ))}
         </group>
     );
 }
 
 function ServerRack({ position }: { position: [number, number, number] }) {
-    const [lights] = useState(() => Array.from({ length: 5 }, () => Math.random()));
-    
-    useFrame((state) => {
-        // Blinking effect logic could go here
-    });
-
+    // Simplified ServerRack without blinking lights for performance
     return (
         <group position={position}>
-            {/* Main Cabinet */}
             <Box args={[0.8, 2.5, 0.8]} position={[0, 1.25, 0]}>
                 <meshStandardMaterial color="#1a1a20" roughness={0.2} metalness={0.8} />
             </Box>
-            {/* Glowing Status Lights */}
-            {lights.map((val, i) => (
-                <mesh key={i} position={[0.41, 0.5 + i * 0.4, 0.2]}>
-                    <planeGeometry args={[0.05, 0.1]} />
-                    <meshBasicMaterial color={val > 0.5 ? "#00ff00" : "#ff0000"} />
-                </mesh>
-            ))}
-             {/* Server Blades */}
             {[...Array(6)].map((_, i) => (
                 <Box key={i} args={[0.7, 0.05, 0.75]} position={[0, 0.3 + i * 0.4, 0]}>
                      <meshStandardMaterial color="#333" />
@@ -90,24 +70,11 @@ function ServerRack({ position }: { position: [number, number, number] }) {
 
 function DataStream({ start, end, color }: { start: [number, number, number], end: [number, number, number], color: string }) {
     const points = useMemo(() => [new THREE.Vector3(...start), new THREE.Vector3(...end)], [start, end]);
-    const ref = useRef<any>(null);
-
-    useFrame((state) => {
-        if (ref.current) {
-            ref.current.material.dashOffset -= 0.02;
-        }
-    });
-
     return (
         <Line
-            ref={ref}
             points={points}
             color={color}
-            lineWidth={2}
-            dashed
-            dashScale={2}
-            dashSize={1}
-            gapSize={1}
+            lineWidth={1}
             opacity={0.5}
             transparent
         />
@@ -119,12 +86,8 @@ function DatabaseNode({ position }: { position: [number, number, number] }) {
         <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
             <group position={position}>
                 {[0, 0.4, 0.8].map((y, i) => (
-                    <Cylinder key={i} args={[0.6, 0.6, 0.3, 32]} position={[0, y, 0]}>
+                    <Cylinder key={i} args={[0.6, 0.6, 0.3, 16]} position={[0, y, 0]}>
                         <meshStandardMaterial color="#2a2a35" metalness={0.8} roughness={0.2} />
-                        <mesh position={[0, 0, 0.61]}>
-                            <ringGeometry args={[0.55, 0.6, 32]} />
-                            <meshBasicMaterial color="#00ffff" />
-                        </mesh>
                     </Cylinder>
                 ))}
             </group>
@@ -151,7 +114,7 @@ function AnimatedSphere() {
     <Float speed={2} rotationIntensity={1} floatIntensity={1.5}>
       <group position={[2, 0, 0]}>
           <mesh ref={wireframeRef} scale={2.5}>
-            <icosahedronGeometry args={[1, 2]} />
+            <icosahedronGeometry args={[1, 1]} />
             <meshStandardMaterial
               color="#8b2cf5"
               wireframe
@@ -160,7 +123,7 @@ function AnimatedSphere() {
             />
           </mesh>
           <mesh ref={meshRef} scale={2}>
-            <icosahedronGeometry args={[1, 4]} />
+            <icosahedronGeometry args={[1, 2]} />
             <meshStandardMaterial
               color="#00ffff"
               wireframe
@@ -171,7 +134,7 @@ function AnimatedSphere() {
             />
           </mesh>
           <mesh scale={1.2}>
-             <icosahedronGeometry args={[1, 15]} />
+             <icosahedronGeometry args={[1, 4]} />
              <MeshDistortMaterial
               color="#0a0a0a"
               attach="material"
@@ -215,7 +178,7 @@ function MovingGrid() {
 export default function Scene() {
   return (
     <div className="absolute inset-0 z-0">
-      <Canvas gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}>
+      <Canvas>
         <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={50} />
         
         <color attach="background" args={['#030305']} />
@@ -225,7 +188,7 @@ export default function Scene() {
         <pointLight position={[10, 10, 10]} intensity={2} color="#00ffff" />
         <pointLight position={[-10, -5, -10]} intensity={2} color="#8b2cf5" />
         
-        <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
+        <Stars radius={100} depth={50} count={1000} factor={4} saturation={0} fade speed={1} />
         
         {/* Central Core */}
         <AnimatedSphere />
@@ -234,8 +197,6 @@ export default function Scene() {
         <FloatingCode position={[-3, 2.5, -2]} text="<System.Init />" />
         <FloatingCode position={[3.5, -1.5, -1]} text="{ debug: true }" />
         <FloatingCode position={[-2.5, -2, 0]} text="npm run deploy" />
-        <FloatingCode position={[4, 3, -4]} text="git push origin main" />
-        <FloatingCode position={[-5, 0, -3]} text="SELECT * FROM users" />
 
         {/* Infrastructure Elements */}
         <group position={[-5, -1, -5]}>
@@ -245,13 +206,11 @@ export default function Scene() {
 
         <group position={[5, -0.5, -4]}>
             <DatabaseNode position={[0, 0, 0]} />
-            <DatabaseNode position={[1.5, 0.5, -1]} />
         </group>
 
         {/* Data Connections */}
         <DataStream start={[-5, 1, -5]} end={[2, 0, 0]} color="#8b2cf5" />
         <DataStream start={[5, 1, -4]} end={[2, 0, 0]} color="#00ffff" />
-        <DataStream start={[-3, 2, -2]} end={[0, 0, -5]} color="#ffffff" />
         
         {/* Tech Rings */}
         <TechRing position={[0, 0, -5]} color="#8b2cf5" scale={3} speed={0.5} />

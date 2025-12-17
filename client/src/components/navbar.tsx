@@ -39,10 +39,8 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <Link href="/">
-          <a className="text-2xl font-bold font-display tracking-tighter hover:text-primary transition-colors">
-            LUMINA<span className="text-primary">.</span>
-          </a>
+        <Link href="/" className="text-2xl font-bold font-display tracking-tighter hover:text-primary transition-colors cursor-pointer">
+          LUMINA<span className="text-primary">.</span>
         </Link>
 
         {/* Desktop Nav */}
