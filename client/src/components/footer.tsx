@@ -6,10 +6,8 @@ export default function Footer() {
       <div className="container px-6 mx-auto">
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-1 md:col-span-2">
-            <Link href="/">
-              <a className="text-2xl font-bold font-display tracking-tighter hover:text-primary transition-colors mb-4 block">
-                LUMINA<span className="text-primary">.</span>
-              </a>
+            <Link href="/" className="text-2xl font-bold font-display tracking-tighter hover:text-primary transition-colors mb-4 block">
+              LUMINA<span className="text-primary">.</span>
             </Link>
             <p className="text-muted-foreground max-w-sm">
               Empowering innovators with cutting-edge digital solutions. We build the future, one pixel at a time.

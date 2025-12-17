@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, MeshDistortMaterial, PerspectiveCamera, Grid, Stars, Text, Line, Ring, Box, Cylinder } from "@react-three/drei";
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo, Suspense } from "react";
 import * as THREE from "three";
 
 function FloatingCode({ position, text }: { position: [number, number, number], text: string }) {
@@ -19,7 +19,8 @@ function FloatingCode({ position, text }: { position: [number, number, number], 
                 position={position}
                 fontSize={0.2}
                 color="#00ffff"
-                font="https://fonts.gstatic.com/s/jetbrainsmono/v18/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnF8RD8yKxTOlOV.woff"
+                // Using a standard font to avoid loading issues if the custom one fails
+                font="https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2" 
                 characters="abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+"
                 anchorX="center"
                 anchorY="middle"
@@ -42,7 +43,7 @@ function TechRing({ position, color, scale = 1, speed = 1 }: { position: [number
 
     return (
         <group ref={ref} position={position} scale={scale}>
-            <Ring args={[2, 2.05, 64]} renderOrder={1}>
+            <Ring args={[2, 2.05, 32]} renderOrder={1}>
                 <meshBasicMaterial color={color} transparent opacity={0.3} side={THREE.DoubleSide} />
             </Ring>
             <Ring args={[1.8, 1.82, 32]} renderOrder={1}>
@@ -53,7 +54,6 @@ function TechRing({ position, color, scale = 1, speed = 1 }: { position: [number
 }
 
 function ServerRack({ position }: { position: [number, number, number] }) {
-    // Simplified ServerRack without blinking lights for performance
     return (
         <group position={position}>
             <Box args={[0.8, 2.5, 0.8]} position={[0, 1.25, 0]}>
@@ -175,49 +175,67 @@ function MovingGrid() {
     )
 }
 
+function FallbackCube() {
+    // Simple rotating cube to verify rendering works if everything else fails
+    const ref = useRef<THREE.Mesh>(null);
+    useFrame(() => {
+        if(ref.current) {
+            ref.current.rotation.x += 0.01;
+            ref.current.rotation.y += 0.01;
+        }
+    });
+    return (
+        <mesh ref={ref} position={[-4, 3, -5]}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshBasicMaterial color="red" wireframe />
+        </mesh>
+    );
+}
+
 export default function Scene() {
   return (
-    <div className="absolute inset-0 z-0">
-      <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={50} />
-        
-        <color attach="background" args={['#030305']} />
-        <fog attach="fog" args={['#030305', 5, 30]} />
+    <div className="absolute inset-0 z-0 w-full h-full">
+      <Canvas 
+        dpr={[1, 2]} 
+        resize={{ scroll: false }}
+        camera={{ position: [0, 0, 8], fov: 50 }}
+      >
+        <Suspense fallback={null}>
+            <color attach="background" args={['#030305']} />
+            <fog attach="fog" args={['#030305', 5, 30]} />
 
-        <ambientLight intensity={0.2} />
-        <pointLight position={[10, 10, 10]} intensity={2} color="#00ffff" />
-        <pointLight position={[-10, -5, -10]} intensity={2} color="#8b2cf5" />
-        
-        <Stars radius={100} depth={50} count={1000} factor={4} saturation={0} fade speed={1} />
-        
-        {/* Central Core */}
-        <AnimatedSphere />
-        
-        {/* Floating Code Snippets */}
-        <FloatingCode position={[-3, 2.5, -2]} text="<System.Init />" />
-        <FloatingCode position={[3.5, -1.5, -1]} text="{ debug: true }" />
-        <FloatingCode position={[-2.5, -2, 0]} text="npm run deploy" />
+            <ambientLight intensity={0.2} />
+            <pointLight position={[10, 10, 10]} intensity={2} color="#00ffff" />
+            <pointLight position={[-10, -5, -10]} intensity={2} color="#8b2cf5" />
+            
+            <Stars radius={100} depth={50} count={1000} factor={4} saturation={0} fade speed={1} />
+            
+            <AnimatedSphere />
+            
+            <FloatingCode position={[-3, 2.5, -2]} text="<System.Init />" />
+            <FloatingCode position={[3.5, -1.5, -1]} text="{ debug: true }" />
+            <FloatingCode position={[-2.5, -2, 0]} text="npm run deploy" />
 
-        {/* Infrastructure Elements */}
-        <group position={[-5, -1, -5]}>
-            <ServerRack position={[0, 0, 0]} />
-            <ServerRack position={[1.5, 0, 0.5]} />
-        </group>
+            <group position={[-5, -1, -5]}>
+                <ServerRack position={[0, 0, 0]} />
+                <ServerRack position={[1.5, 0, 0.5]} />
+            </group>
 
-        <group position={[5, -0.5, -4]}>
-            <DatabaseNode position={[0, 0, 0]} />
-        </group>
+            <group position={[5, -0.5, -4]}>
+                <DatabaseNode position={[0, 0, 0]} />
+            </group>
 
-        {/* Data Connections */}
-        <DataStream start={[-5, 1, -5]} end={[2, 0, 0]} color="#8b2cf5" />
-        <DataStream start={[5, 1, -4]} end={[2, 0, 0]} color="#00ffff" />
-        
-        {/* Tech Rings */}
-        <TechRing position={[0, 0, -5]} color="#8b2cf5" scale={3} speed={0.5} />
-        <TechRing position={[0, 0, -8]} color="#00ffff" scale={4} speed={-0.3} />
-        
-        <MovingGrid />
-        
+            <DataStream start={[-5, 1, -5]} end={[2, 0, 0]} color="#8b2cf5" />
+            <DataStream start={[5, 1, -4]} end={[2, 0, 0]} color="#00ffff" />
+            
+            <TechRing position={[0, 0, -5]} color="#8b2cf5" scale={3} speed={0.5} />
+            <TechRing position={[0, 0, -8]} color="#00ffff" scale={4} speed={-0.3} />
+            
+            <MovingGrid />
+            
+            {/* Debug Element - if user sees red cube, canvas is working */}
+            <FallbackCube />
+        </Suspense>
       </Canvas>
     </div>
   );
