@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Terminal } from "lucide-react";
 import { HolographicButton } from "@/components/ui/holographic-button";
-import LightPillar from "./LightPillar";
+import LazyLightPillar from "./LazyLightPillar";
 
 export default function Hero() {
   const scrollToContact = () => {
@@ -15,7 +15,7 @@ export default function Hero() {
     <section className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black">
       {/* Light Pillar Background - Optimized for mobile */}
       <div className="absolute inset-0 z-0">
-        <LightPillar
+        <LazyLightPillar
           topColor="#5227FF"
           bottomColor="#FF9FFC"
           intensity={1.2}

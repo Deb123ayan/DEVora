@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Plasma from "./plasma";
+import LazyPlasma from "./LazyPlasma";
 
 const projects = [
   {
@@ -32,7 +32,7 @@ export default function Projects() {
     <section id="projects" className="py-24 relative bg-black overflow-hidden">
       {/* Plasma Background */}
       <div className="absolute inset-0 z-0">
-        <Plasma color="#ff6b6b" speed={0.7} opacity={0.4} direction="pingpong" />
+        <LazyPlasma color="#ff6b6b" speed={0.7} opacity={0.4} direction="pingpong" />
       </div>
       
       {/* Overlay */}

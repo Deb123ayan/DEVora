@@ -1,6 +1,6 @@
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import { Code2, Smartphone, GraduationCap, Palette, Bot, ArrowUpRight } from "lucide-react";
-import Hyperspeed from "./hyperspeed";
+import LazyHyperspeed from "./LazyHyperspeed";
 
 const services = [
   {
@@ -90,7 +90,7 @@ export default function Services() {
     <section id="services" className="py-24 relative bg-black overflow-hidden">
       {/* Hyperspeed Background */}
       <div className="absolute inset-0 z-0">
-        <Hyperspeed
+        <LazyHyperspeed
           effectOptions={{
             onSpeedUp: () => { },
             onSlowDown: () => { },

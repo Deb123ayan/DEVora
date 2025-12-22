@@ -20,13 +20,35 @@ async function buildStatic() {
     throw new Error("Could not load vite config");
   }
   
-  // Override the build output directory
+  // Override the build output directory with optimizations
   const config = {
     ...configFile.config,
     build: {
       ...configFile.config.build,
       outDir: distPath,
       emptyOutDir: true,
+      // Enable code splitting and optimization
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Split vendor libraries
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-three': ['three', 'postprocessing'],
+            'vendor-motion': ['framer-motion'],
+            'vendor-ui': ['@radix-ui/react-tooltip', '@radix-ui/react-toast'],
+          },
+          // Optimize chunk file names
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]'
+        }
+      },
+      // Enable compression and minification
+      minify: 'esbuild', // Use esbuild instead of terser for faster builds
+      // Optimize chunk size
+      chunkSizeWarningLimit: 500,
+      // Enable source map for debugging (optional)
+      sourcemap: false
     },
   };
   
