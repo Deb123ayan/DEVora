@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import Logo from "./Logo";
 
 const navLinks = [
   { name: "Services", href: "#services" },
@@ -39,8 +40,9 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold font-display tracking-tighter hover:text-primary transition-colors cursor-pointer">
-          LUMINA<span className="text-primary">.</span>
+        <Link href="/" className="flex items-center gap-3 text-2xl font-bold font-display tracking-tighter hover:text-primary transition-colors cursor-pointer">
+          <Logo size={28} className="flex-shrink-0" />
+          DEVora<span className="text-primary">.</span>
         </Link>
 
         {/* Desktop Nav */}

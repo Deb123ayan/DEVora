@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Plasma from "./plasma";
 
 const projects = [
   {
@@ -28,8 +29,16 @@ const projects = [
 
 export default function Projects() {
   return (
-    <section id="projects" className="py-24 relative bg-black/90">
-      <div className="container px-6 mx-auto">
+    <section id="projects" className="py-24 relative bg-black overflow-hidden">
+      {/* Plasma Background */}
+      <div className="absolute inset-0 z-0">
+        <Plasma color="#ff6b6b" speed={0.7} opacity={0.4} direction="pingpong" />
+      </div>
+      
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/60 z-10" />
+      
+      <div className="container px-6 mx-auto relative z-20">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div className="max-w-2xl">
             <h2 className="text-3xl md:text-5xl font-bold font-display mb-6">

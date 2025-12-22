@@ -1,0 +1,12 @@
+- [x] Reduce car light instances from 40 to 20 pairs per roadway
+- [x] Lower road geometry segments from 100 to 50
+- [x] Disable bloom effect to reduce post-processing load
+- [x] Set pixel ratio to 1 for lower resolution rendering
+- [x] Optimize distortion calculations by reducing uniform values
+- [x] Reduce road length from 400 to 200
+- [x] Disable SMAA effect
+- [x] Remove bloom and SMAA passes from composer to eliminate overhead
+- [x] Reduce road plane geometry segments (width: 20->10, height: 50->25)
+- [x] Reduce car light tube geometry segments (radial: 40->20, tubular: 8->4)
+- [x] Reduce lanes per road from 4 to 2 for fewer road markings
+- [ ] Test performance improvements on PC
