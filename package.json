@@ -4,13 +4,13 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
+    "dev": "vite dev --port 5000",
     "dev:client": "vite dev --port 5000",
-    "dev": "cross-env NODE_ENV=development tsx server/index.ts",
-    "build": "tsx script/build.ts",
+    "build": "npm run build:static",
     "build:static": "tsx script/build-static.ts",
-    "start": "cross-env NODE_ENV=production node dist/index.cjs",
-    "check": "tsc",
-    "db:push": "drizzle-kit push"
+    "preview": "vite preview --port 5000",
+    "start": "npx serve dist",
+    "check": "tsc"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

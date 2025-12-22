@@ -37,7 +37,6 @@ const LightPillar: React.FC<LightPillarProps> = ({
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.OrthographicCamera | null>(null);
   const geometryRef = useRef<THREE.PlaneGeometry | null>(null);
-  const mouseRef = useRef<THREE.Vector2>(new THREE.Vector2(0, 0));
   const timeRef = useRef<number>(0);
   const [webGLSupported, setWebGLSupported] = useState<boolean>(true);
   const [isLowPerformance, setIsLowPerformance] = useState<boolean>(false);
@@ -67,7 +66,7 @@ const LightPillar: React.FC<LightPillarProps> = ({
     
     // Mobile optimization - reduce quality on smaller screens
     const isMobile = width < 768;
-    const pixelRatio = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
+    const pixelRatio = isMobile ? 0.75 : 1; // Further reduced for mobile
 
     // Scene setup
     const scene = new THREE.Scene();
@@ -79,10 +78,10 @@ const LightPillar: React.FC<LightPillarProps> = ({
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({
-        antialias: !isMobile, // Disable antialiasing on mobile for performance
+        antialias: false, // Always disabled for performance
         alpha: true,
-        powerPreference: isMobile ? 'default' : 'high-performance',
-        precision: isMobile ? 'mediump' : 'lowp',
+        powerPreference: 'default', // Use default for better compatibility
+        precision: 'lowp',
         stencil: false,
         depth: false
       });
@@ -115,22 +114,17 @@ const LightPillar: React.FC<LightPillarProps> = ({
     const fragmentShader = `
       uniform float uTime;
       uniform vec2 uResolution;
-      uniform vec2 uMouse;
       uniform vec3 uTopColor;
       uniform vec3 uBottomColor;
       uniform float uIntensity;
-      uniform bool uInteractive;
       uniform float uGlowAmount;
       uniform float uPillarWidth;
       uniform float uPillarHeight;
       uniform float uNoiseIntensity;
-      uniform float uPillarRotation;
       varying vec2 vUv;
 
       const float PI = 3.141592653589793;
       const float EPSILON = 0.001;
-      const float E = 2.71828182845904523536;
-      const float HALF = 0.5;
 
       mat2 rot(float angle) {
         float s = sin(angle);
@@ -138,115 +132,69 @@ const LightPillar: React.FC<LightPillarProps> = ({
         return mat2(c, -s, s, c);
       }
 
-      // Procedural noise function
+      // Simplified noise function
       float noise(vec2 coord) {
-        float G = E;
-        vec2 r = (G * sin(G * coord));
-        return fract(r.x * r.y * (1.0 + coord.x));
+        return fract(sin(dot(coord, vec2(12.9898, 78.233))) * 43758.5453);
       }
 
-      // Apply layered wave deformation to position
+      // Simplified wave deformation
       vec3 applyWaveDeformation(vec3 pos, float timeOffset) {
-        float frequency = 1.0;
-        float amplitude = 1.0;
         vec3 deformed = pos;
-        
-        // Reduce iterations on mobile for performance
-        float maxIterations = uResolution.x < 768.0 ? 2.0 : 4.0;
-        
-        for(float i = 0.0; i < maxIterations; i++) {
-          deformed.xz *= rot(0.4);
-          float phase = timeOffset * i * 2.0;
-          vec3 oscillation = cos(deformed.zxy * frequency - phase);
-          deformed += oscillation * amplitude;
-          frequency *= 2.0;
-          amplitude *= HALF;
-        }
-        
+        deformed.xz *= rot(0.3);
+        vec3 oscillation = cos(deformed.zxy * 1.0 - timeOffset);
+        deformed += oscillation * 0.5;
         return deformed;
-      }
-
-      // Polynomial smooth blending between two values
-      float blendMin(float a, float b, float k) {
-        float scaledK = k * 4.0;
-        float h = max(scaledK - abs(a - b), 0.0);
-        return min(a, b) - h * h * 0.25 / scaledK;
-      }
-
-      float blendMax(float a, float b, float k) {
-        return -blendMin(-a, -b, k);
       }
 
       void main() {
         vec2 fragCoord = vUv * uResolution;
         vec2 uv = (fragCoord * 2.0 - uResolution) / uResolution.y;
         
-        // Apply 2D rotation to UV coordinates
-        float rotAngle = uPillarRotation * PI / 180.0;
-        uv *= rot(rotAngle);
-        
         vec3 origin = vec3(0.0, 0.0, -10.0);
         vec3 direction = normalize(vec3(uv, 1.0));
-        float maxDepth = 50.0;
+        float maxDepth = 30.0; // Reduced from 50.0
         float depth = 0.1;
         
-        mat2 rotX = rot(uTime * 0.3);
-        vec2 mouseInfluence = vec2(0.0);
-        
-        if(uInteractive && length(uMouse) > 0.0) {
-          // Enhanced mouse interaction with parallax effects
-          rotX = rot(uMouse.x * PI * 1.5 + uTime * 0.2);
-          
-          // Add mouse-based distortion for parallax effect
-          mouseInfluence = uMouse * 0.3;
-          uv += mouseInfluence * (1.0 + sin(uTime * 2.0) * 0.1);
-        }
+        mat2 rotX = rot(uTime * 0.2); // Slower rotation
         
         vec3 color = vec3(0.0);
         
-        // Reduce ray marching steps on mobile for performance
-        float maxSteps = uResolution.x < 768.0 ? 50.0 : 100.0;
+        // Reduced ray marching steps for better performance
+        float maxSteps = uResolution.x < 768.0 ? 25.0 : 40.0; // Reduced from 50/100
         
         for(float i = 0.0; i < maxSteps; i++) {
           vec3 pos = origin + direction * depth;
           pos.xz *= rotX;
           
-          // Apply vertical scaling and wave deformation with mouse influence
+          // Simplified deformation
           vec3 deformed = pos;
           deformed.y *= uPillarHeight;
-          
-          // Add mouse-based position offset for parallax
-          if(uInteractive && length(uMouse) > 0.0) {
-            deformed.x += uMouse.x * 0.5 * sin(uTime + pos.y * 0.1);
-            deformed.z += uMouse.y * 0.3 * cos(uTime + pos.x * 0.1);
-          }
-          
           deformed = applyWaveDeformation(deformed + vec3(0.0, uTime, 0.0), uTime);
           
-          // Calculate distance field using cosine pattern
-          vec2 cosinePair = cos(deformed.xz);
-          float fieldDistance = length(cosinePair) - 0.2;
+          // Simplified distance field
+          vec2 cosinePair = cos(deformed.xz * 0.8); // Reduced frequency
+          float fieldDistance = length(cosinePair) - 0.3; // Larger core
           
-          // Radial boundary constraint
+          // Radial boundary
           float radialBound = length(pos.xz) - uPillarWidth;
-          fieldDistance = blendMax(radialBound, fieldDistance, 1.0);
-          fieldDistance = abs(fieldDistance) * 0.15 + 0.01;
+          fieldDistance = max(radialBound, fieldDistance);
+          fieldDistance = abs(fieldDistance) * 0.2 + 0.02; // Smoother
           
-          vec3 gradient = mix(uBottomColor, uTopColor, smoothstep(15.0, -15.0, pos.y));
-          color += gradient * pow(1.0 / fieldDistance, 1.0);
+          vec3 gradient = mix(uBottomColor, uTopColor, smoothstep(10.0, -10.0, pos.y));
+          color += gradient * pow(1.0 / fieldDistance, 0.8); // Reduced power
           
           if(fieldDistance < EPSILON || depth > maxDepth) break;
           depth += fieldDistance;
         }
         
-        // Normalize by pillar width to maintain consistent glow regardless of size
-        float widthNormalization = uPillarWidth / 3.0;
-        color = tanh(color * uGlowAmount / widthNormalization);
+        // Simplified color processing
+        color = tanh(color * uGlowAmount);
         
-        // Add noise postprocessing - reduce on mobile
-        float rnd = noise(gl_FragCoord.xy);
-        float noiseAmount = uResolution.x < 768.0 ? uNoiseIntensity * 0.5 : uNoiseIntensity;
-        color -= rnd / 15.0 * noiseAmount;
+        // Minimal noise
+        if(uNoiseIntensity > 0.0) {
+          float rnd = noise(gl_FragCoord.xy * 0.01);
+          color -= rnd * uNoiseIntensity * 0.1;
+        }
         
         gl_FragColor = vec4(color * uIntensity, 1.0);
       }
@@ -258,16 +206,13 @@ const LightPillar: React.FC<LightPillarProps> = ({
       uniforms: {
         uTime: { value: 0 },
         uResolution: { value: new THREE.Vector2(width, height) },
-        uMouse: { value: mouseRef.current },
         uTopColor: { value: parseColor(topColor) },
         uBottomColor: { value: parseColor(bottomColor) },
         uIntensity: { value: intensity },
-        uInteractive: { value: interactive },
         uGlowAmount: { value: glowAmount },
         uPillarWidth: { value: pillarWidth },
         uPillarHeight: { value: pillarHeight },
-        uNoiseIntensity: { value: noiseIntensity },
-        uPillarRotation: { value: pillarRotation }
+        uNoiseIntensity: { value: noiseIntensity }
       },
       transparent: true,
       depthWrite: false,
@@ -281,56 +226,9 @@ const LightPillar: React.FC<LightPillarProps> = ({
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    // Mouse interaction - enhanced for better parallax effects
-    let mouseMoveTimeout: number | null = null;
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!interactive) return;
-      if (mouseMoveTimeout) return;
-      
-      mouseMoveTimeout = window.setTimeout(() => {
-        mouseMoveTimeout = null;
-      }, 8); // Higher frequency for smoother interaction
-
-      const rect = container.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      
-      // Enhanced mouse responsiveness with smoothing
-      const smoothingFactor = 0.1;
-      const currentMouse = mouseRef.current;
-      const targetX = x * 0.8; // Reduce sensitivity for smoother movement
-      const targetY = y * 0.8;
-      
-      currentMouse.x += (targetX - currentMouse.x) * smoothingFactor;
-      currentMouse.y += (targetY - currentMouse.y) * smoothingFactor;
-    };
-
-    if (interactive) {
-      container.addEventListener('mousemove', handleMouseMove, { passive: true });
-      
-      // Add mouse leave event to gradually return to center
-      const handleMouseLeave = () => {
-        const returnToCenter = () => {
-          const currentMouse = mouseRef.current;
-          const centeringSpeed = 0.05;
-          
-          currentMouse.x += (0 - currentMouse.x) * centeringSpeed;
-          currentMouse.y += (0 - currentMouse.y) * centeringSpeed;
-          
-          // Continue centering if not close enough to center
-          if (Math.abs(currentMouse.x) > 0.01 || Math.abs(currentMouse.y) > 0.01) {
-            requestAnimationFrame(returnToCenter);
-          }
-        };
-        requestAnimationFrame(returnToCenter);
-      };
-      
-      container.addEventListener('mouseleave', handleMouseLeave, { passive: true });
-    }
-
-    // Animation loop with fixed timestep
+    // Animation loop with fixed timestep - simplified
     let lastTime = performance.now();
-    const targetFPS = 60;
+    const targetFPS = 30; // Reduced from 60 for better performance
     const frameTime = 1000 / targetFPS;
 
     const animate = (currentTime: number) => {
@@ -371,10 +269,6 @@ const LightPillar: React.FC<LightPillarProps> = ({
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
-      if (interactive) {
-        container.removeEventListener('mousemove', handleMouseMove);
-        container.removeEventListener('mouseleave', () => {});
-      }
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }
@@ -403,12 +297,10 @@ const LightPillar: React.FC<LightPillarProps> = ({
     bottomColor,
     intensity,
     rotationSpeed,
-    interactive,
     glowAmount,
     pillarWidth,
     pillarHeight,
     noiseIntensity,
-    pillarRotation,
     webGLSupported
   ]);
 

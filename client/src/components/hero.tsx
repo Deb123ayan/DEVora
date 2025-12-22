@@ -18,25 +18,22 @@ export default function Hero() {
         <LazyLightPillar
           topColor="#5227FF"
           bottomColor="#FF9FFC"
-          intensity={1.2}
-          rotationSpeed={0.4}
-          glowAmount={0.008}
-          pillarWidth={2.5}
-          pillarHeight={0.6}
-          noiseIntensity={0.3}
+          intensity={0.8}
+          rotationSpeed={0.1}
+          glowAmount={0.004}
+          pillarWidth={2.0}
+          pillarHeight={0.3}
+          noiseIntensity={0.1}
           pillarRotation={0}
-          interactive={true}
+          interactive={false}
           mixBlendMode="screen"
-          className="opacity-70 md:opacity-100"
+          className="opacity-60 md:opacity-80"
         />
       </div>
 
-      {/* Enhanced gradient overlays for better text visibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/60 z-10 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] z-10 pointer-events-none" />
-
-      {/* Mobile-specific stronger overlay */}
-      <div className="absolute inset-0 bg-black/30 z-10 pointer-events-none md:hidden" />
+      {/* Subtle gradient overlays for better text visibility */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 z-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.2)_100%)] z-10 pointer-events-none" />
 
       {/* Content */}
       <div className="container relative z-20 px-6 mx-auto text-center md:text-left grid md:grid-cols-2 gap-12 items-center">
@@ -55,14 +52,14 @@ export default function Hero() {
             </div>
           </div>
 
-          <h1 className="text-5xl md:text-8xl font-bold font-display tracking-tight leading-none mb-6 text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/50 drop-shadow-2xl [text-shadow:_0_2px_10px_rgb(0_0_0_/_80%)]">
+          <h1 className="text-5xl md:text-8xl font-bold font-display tracking-tight leading-none mb-6 text-white drop-shadow-2xl">
             ARCHITECTING <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600 animate-gradient-x [text-shadow:_0_2px_10px_rgb(0_0_0_/_80%)]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600 animate-gradient-x drop-shadow-2xl">
               DIGITAL CORE
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-200 md:text-gray-400 mb-10 max-w-lg leading-relaxed font-light [text-shadow:_0_1px_5px_rgb(0_0_0_/_60%)] bg-black/20 md:bg-transparent p-4 md:p-0 rounded-lg md:rounded-none backdrop-blur-sm md:backdrop-blur-none">
+          <p className="text-lg md:text-xl text-gray-100 mb-10 max-w-lg leading-relaxed font-light drop-shadow-lg">
             We build the complex systems that power tomorrow. Full-stack
             engineering, AI integration, and scalable architecture for
             visionaries.

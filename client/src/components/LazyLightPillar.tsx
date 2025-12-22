@@ -1,9 +1,5 @@
-import React, { lazy, Suspense } from 'react';
-import { useConnection } from '@/hooks/use-connection';
-import LightPillarLite from './LightPillarLite';
-
-// Lazy load the heavy LightPillar component
-const LightPillar = lazy(() => import('./LightPillar'));
+import React from 'react';
+import LightPillar from './LightPillar';
 
 interface LazyLightPillarProps {
   topColor?: string;
@@ -21,19 +17,8 @@ interface LazyLightPillarProps {
 }
 
 const LazyLightPillar: React.FC<LazyLightPillarProps> = (props) => {
-  const { isSlowConnection } = useConnection();
-
-  // Use lightweight version for slow connections
-  if (isSlowConnection) {
-    return <LightPillarLite className={props.className} mixBlendMode={props.mixBlendMode} />;
-  }
-
-  // Use full version with lazy loading for fast connections
-  return (
-    <Suspense fallback={<LightPillarLite className={props.className} mixBlendMode={props.mixBlendMode} />}>
-      <LightPillar {...props} />
-    </Suspense>
-  );
+  // Simplified - just use the regular LightPillar
+  return <LightPillar {...props} />;
 };
 
 export default LazyLightPillar;
