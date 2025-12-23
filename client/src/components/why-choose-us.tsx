@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { Rocket, ShieldCheck, Clock, Users } from "lucide-react";
+import { Rocket, ShieldCheck, Clock, DollarSign } from "lucide-react";
 
 const stats = [
-  { label: "Projects Delivered", value: "150+", icon: Rocket },
-  { label: "Happy Clients", value: "80+", icon: Users },
+  { label: "Technologies Mastered", value: "20+", icon: Rocket },
+  { label: "Affordable Pricing", value: "50%", icon: DollarSign },
   { label: "Code Quality", value: "100%", icon: ShieldCheck },
   { label: "Support", value: "24/7", icon: Clock },
 ];

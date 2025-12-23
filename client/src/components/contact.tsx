@@ -70,7 +70,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email Us</p>
-                  <p className="text-lg font-medium">hello@lumina.tech</p>
+                  <p className="text-lg font-medium">devora_tech@yahoo.com</p>
                 </div>
               </div>
               
@@ -80,7 +80,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Call Us</p>
-                  <p className="text-lg font-medium">+1 (555) 123-4567</p>
+                  <p className="text-lg font-medium">+91 800-113-5771</p>
                 </div>
               </div>
 
@@ -90,7 +90,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Visit Us</p>
-                  <p className="text-lg font-medium">San Francisco, CA</p>
+                  <p className="text-lg font-medium">Bhubaneswar , Odisha</p>
                 </div>
               </div>
             </div>
